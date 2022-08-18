@@ -1,3 +1,4 @@
+
 from google_play_scraper import app
 from urllib import response
 
@@ -35,32 +36,36 @@ def request_screenshots(parsed):
         path=(app_folder+'/screenshot{}.png').format(index)
         open(path,'wb').write(response.content)
 
+def get_bold_format(workbook):
+    return workbook.add_format({'bold': True})
+
+def write_headers(workbook):
+    headers=['App ID', "Title", "Genre", "Installs", "Release Date"]
+    for i in range(len(headers)):
+        workbook.write(0,i,headers[i],get_bold_format(workbook))
+
+
 
 def write_to_xlsx(rows):
     file_name='apps.xlsx'
     if os.path.exists(file_name):
         os.remove(file_name)
 
-    headers=['App ID', "Title", "Genre", "Installs", "Release Date"]
-    data=[]
-    data.insert(0,headers)
-    for row in rows:
-        data.append(row)
-
-    print(data)
+    print(rows)
     workbook = xlsxwriter.Workbook(file_name)
     worksheet = workbook.add_worksheet("Apps")
+    write_headers(workbook)
     row=1
     col=1
-    for i in range(len(data)):
-        for j in range(len(data[i])):
-            worksheet.write(row+i,col+j,data[i][j])        
+    for i in range(len(rows)):
+        for j in range(len(rows[i])):
+            worksheet.write(row+i,col+j,rows[i][j])        
         row=i+1
     workbook.close()
 
 
 def main():
-    parsed=parse_single('games.urmobi.merge.connect')
+    parsed=parse_single('co.urmobi.casual.larrysfishing')
     filtred=filter_single(parsed)
     request_ico(parsed)
     request_screenshots(parsed)
