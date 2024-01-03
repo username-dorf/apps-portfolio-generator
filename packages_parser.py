@@ -5,6 +5,7 @@ import requests
 import os
 
 FILE_NAME = "apps.xlsx"
+CONTENT_DIRECTORY = "apps_content"
 
 SETUP = [
     ("Icon", 10, False),  # text, width, wrap
@@ -27,11 +28,18 @@ def filter_single(parsed):
     return [parsed['appId'], parsed['title'], parsed['genre'], parsed['installs'], parsed['released'], parsed['url']]
 
 
+def create_content_dir():
+    content_directory = CONTENT_DIRECTORY
+    if not os.path.exists(f"./{content_directory}"):
+        os.makedirs(f"./{content_directory}")
+
+
 def get_app_folder(parsed):
     sanitized_directory_name = re.sub(r'[<>:"/\\|?*\x00-\x1F]', '_', parsed['title'])
     if sanitized_directory_name.startswith('.'):
         sanitized_directory_name = '_' + sanitized_directory_name[1:]
-    app_folder = 'apps_content/' + sanitized_directory_name
+    content_directory = CONTENT_DIRECTORY
+    app_folder = f'{content_directory}/{sanitized_directory_name}'
     if not os.path.exists(app_folder):
         os.mkdir(app_folder)
     return app_folder
@@ -139,6 +147,7 @@ def parse_packages(packages):
     workbook = create_workbook(file_name)
     worksheet = create_worksheet(workbook)
     format_column(worksheet)
+    create_content_dir()
     invalid_packages_count = 0
     for index, package in enumerate(packages):
         package_index = index-invalid_packages_count
