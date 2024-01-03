@@ -1,0 +1,28 @@
+name: parse apps
+
+on:
+  push:
+    branches:    
+      - main
+
+jobs:
+  getdataandparse:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v3 # checkout the repository content to github runner.
+      - name: setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8 #install the python needed
+      - name: Install dependencies
+        run: |
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: execute py script
+        run: |
+          python runner.py .\packages
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add apps.xlsx
+          git commit -m "crongenerated"
+          git push
